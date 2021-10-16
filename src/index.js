@@ -2,49 +2,47 @@ const express = require('express');
 const { v4: uuid } = require('uuid');
 
 const app = express();
-
 app.use(express.json());
 
 const customers = [];
 
-function verifyExistsAccount(request, response, next) {
-   const { cpf } = request.params;
+function accountAlreadyExists(request, response, next) {
+   const { cpf } = request.headers;
 
-   const customer = customers.find((customer) => customer.cpf === cpf);
+   const findCustomerStatement = customers.find((customer) => customer.cpf === cpf);
 
-   if(!customer) {
+   if(!findCustomerStatement) {
       return response.status(400).json({ error: "Customer not found" });
    }
 
-   request.customer = customer;
+   request.customer = findCustomerStatement;
 
    return next();
 }
 
-app.post('/singup', (request, response) => {
-   const { cpf, name } = request.body
-   //const id = uuid();
-   const alreadyExists = customers.some((customer) => customer.cpf === cpf);
-   
-   if(alreadyExists) {
-      return response.status(400).json({ error: "Customer already exists!" });
-   }
+app.post('/signup', (request, response) => {
+   const { name, cpf } = request.body;
 
+   const alreadyExists = customers.some((customer) => customer.cpf === cpf);
+
+   if(alreadyExists) {
+      return response.status(400).json({ error: "Customer already exists" })
+   }
+   
    customers.push({
       cpf,
       name,
       id: uuid(),
       statement: []
-   })
+   });
 
-   return response.status(201).send()
+   response.status(201).send();
 });
 
-//app.use(verifyExistsAccount);
-
-app.get('/statement/:cpf', verifyExistsAccount, (request, response) => {
+app.get('/statement', accountAlreadyExists, (request, response) => {
    const { customer } = request;
-   return response.json(customer.statement);
+
+   response.json(customer.statement);
 });
 
-app.listen(3000);
+app.listen(3333);
