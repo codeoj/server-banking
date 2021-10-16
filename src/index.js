@@ -6,6 +6,18 @@ app.use(express.json());
 
 const customers = [];
 
+function getBalance(statement) {
+   const balance = statement.reduce((acc, operator) => {
+      if(operator.type === 'deposit') {
+         return acc + operator.amount
+      } else if(operator.type === 'debit') {
+         return acc - operator.amount
+      }
+   }, 0)
+
+   return balance;
+}
+
 function accountAlreadyExists(request, response, next) {
    const { cpf } = request.headers;
 
@@ -55,6 +67,29 @@ app.post('/deposit', accountAlreadyExists, (request, response) => {
 
    response.status(201).send();
 });
+
+app.post('/withdraw', accountAlreadyExists, (request, response) => {
+   const { amount } = request.body;
+   const { customer } = request;
+
+   const balance = getBalance(customer.statement);
+
+   console.log(balance);
+
+   if (balance < amount) {
+      return response.status(400).json({ error: "Insufficient funds!" })
+   }
+
+   const withdrawOperation = {
+      amount,
+      created_at: new Date(),
+      type: 'debit'
+   }
+
+   customer.statement.push(withdrawOperation)
+
+   response.status(201).send();
+})
 
 app.get('/statement', accountAlreadyExists, (request, response) => {
    const { customer } = request;
