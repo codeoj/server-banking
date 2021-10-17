@@ -52,13 +52,19 @@ app.post('/signup', (request, response) => {
    response.status(201).send();
 });
 
-app.put('/singup', accountAlreadyExists, (request, response) => {
+app.put('/signup', accountAlreadyExists, (request, response) => {
    const { name } = request.body;
    const { customer } = request;
 
    customer.name = name;
 
    return response.status(201).send();
+});
+
+app.get('/signup', accountAlreadyExists, (request, response) => {
+   const { customer } = request;
+
+   return response.json(customer);
 });
 
 app.post('/deposit', accountAlreadyExists, (request, response) => {
