@@ -131,4 +131,12 @@ app.get('/statement/date', accountAlreadyExists, (request, response) => {
    return response.json(statement)
 });
 
+app.get('/balance', accountAlreadyExists, (request, response) => {
+   const { customer } = request;
+
+   const balance = getBalance(customer.statement);
+
+   return response.json(balance);
+})
+
 app.listen(3333);
