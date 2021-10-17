@@ -1,4 +1,3 @@
-const { query } = require('express');
 const express = require('express');
 const { v4: uuid } = require('uuid');
 
@@ -59,6 +58,14 @@ app.put('/signup', accountAlreadyExists, (request, response) => {
    customer.name = name;
 
    return response.status(201).send();
+});
+
+app.delete('/signup', accountAlreadyExists, (request, response) => {
+   const { customer } = request;
+
+   customers.splice(customer, 1);
+
+   return response.status(201).json(customers);
 });
 
 app.get('/signup', accountAlreadyExists, (request, response) => {
