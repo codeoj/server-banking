@@ -52,6 +52,15 @@ app.post('/signup', (request, response) => {
    response.status(201).send();
 });
 
+app.put('/singup', accountAlreadyExists, (request, response) => {
+   const { name } = request.body;
+   const { customer } = request;
+
+   customer.name = name;
+
+   return response.status(201).send();
+});
+
 app.post('/deposit', accountAlreadyExists, (request, response) => {
    const { amount, description } = request.body;
 
