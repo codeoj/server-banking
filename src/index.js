@@ -1,3 +1,4 @@
+const { query } = require('express');
 const express = require('express');
 const { v4: uuid } = require('uuid');
 
@@ -57,7 +58,7 @@ app.post('/deposit', accountAlreadyExists, (request, response) => {
    const depositOperation = {
       description,
       amount,
-      createdAt: new Date(),
+      created_at: new Date(),
       type: 'deposit'
    }
 
@@ -95,6 +96,17 @@ app.get('/statement', accountAlreadyExists, (request, response) => {
    const { customer } = request;
 
    response.json(customer.statement);
+});
+
+app.get('/statement/date', accountAlreadyExists, (request, response) => {
+   const { date } = request.query;
+   const { customer } = request;
+
+   const statement = customer.statement.filter((statement) => 
+      statement.created_at.toDateString() === new Date(date).toDateString()
+   );
+
+   return response.json(statement)
 });
 
 app.listen(3333);
